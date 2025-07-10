@@ -57,6 +57,7 @@ namespace argos {
 		 */
 		if (m_strFsmConfiguration.compare("") != 0 && !m_bFiniteStateMachineGiven) {
 			m_pcFsmBuilder = new AutoMoDeFsmBuilder();
+			m_pcFsmBuilder->SetRobotId(m_unRobotID);
 			SetFiniteStateMachine(m_pcFsmBuilder->BuildFiniteStateMachine(m_strFsmConfiguration));
 			if (m_bMaintainHistory) {
 				m_pcFiniteStateMachine->SetHistoryFolder(m_strHistoryFolder);

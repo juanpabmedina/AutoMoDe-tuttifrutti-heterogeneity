@@ -15,7 +15,9 @@ namespace argos {
 	/****************************************/
 	/****************************************/
 
-	AutoMoDeFsmBuilder::AutoMoDeFsmBuilder() {}
+	AutoMoDeFsmBuilder::AutoMoDeFsmBuilder() {
+		unRobotStartId = 0;
+	}
 
 	/****************************************/
 	/****************************************/
@@ -42,25 +44,68 @@ namespace argos {
 	AutoMoDeFiniteStateMachine* AutoMoDeFsmBuilder::BuildFiniteStateMachine(std::vector<std::string>& vec_fsm_config) {
 		cFiniteStateMachine = new AutoMoDeFiniteStateMachine();
 
-		std::vector<std::string>::iterator it;
+		std::vector<std::string>::iterator states_it;
+		std::vector<std::string>::iterator gropus_it;
+
 		try {
-			it = std::find(vec_fsm_config.begin(), vec_fsm_config.end(), "--nstates");
-			m_unNumberStates = atoi((*(it+1)).c_str());
+			states_it = std::find(vec_fsm_config.begin(), vec_fsm_config.end(), "--nstates");
+			gropus_it = std::find(vec_fsm_config.begin(), vec_fsm_config.end(), "--ngroups");
+
+			m_unNumberStates = atoi((*(states_it+1)).c_str());
+			m_unNumberGroups = atoi((*(gropus_it+1)).c_str());
+
 			std::vector<std::string>::iterator first_state;
 			std::vector<std::string>::iterator second_state;
-			for (UInt32 i = 0; i < m_unNumberStates; i++) {
-				std::ostringstream oss;
-				oss << "--s" << i;
-				first_state = std::find(vec_fsm_config.begin(), vec_fsm_config.end(), oss.str());
-				if (i+1 < m_unNumberStates) {
-					std::ostringstream oss;
-					oss << "--s" << i+1;
-					second_state = std::find(vec_fsm_config.begin(), vec_fsm_config.end(), oss.str());
+
+			std::vector<std::string>::iterator first_group;
+			std::vector<std::string>::iterator second_group;
+
+			for (UInt32 i = 0; i < m_unNumberGroups; ++i) {
+				// Looking for where group start
+				std::ostringstream oss_groups;
+				oss_groups << "--g" << i;
+				first_group = std::find(vec_fsm_config.begin(), vec_fsm_config.end(), oss_groups.str());
+				if (i+1 < m_unNumberGroups) {
+					std::ostringstream oss_groups;
+					oss_groups << "--g" << i+1;
+					second_group = std::find(vec_fsm_config.begin(), vec_fsm_config.end(), oss_groups.str());
 				} else {
-					second_state = vec_fsm_config.end();
+					second_group = vec_fsm_config.end();
 				}
-				std::vector<std::string> vecStateConfig(first_state, second_state);
-				HandleState(cFiniteStateMachine, vecStateConfig);
+				std::vector<std::string> vecStateConfig(first_group, second_group);
+				HandleGroup(cFiniteStateMachine, vecStateConfig);
+
+				UInt32 unRobotEndId = unRobotStartId + unGroupRobots - 1;
+				// Assign the robots to the groups based on the RobotID
+				if (m_unRobotId >= unRobotStartId && m_unRobotId <= unRobotEndId) {
+					// std::cout << "Robot: " << m_unRobotId << " assigned to group: " << unGroupId;
+					// std::cout << " With FSM: ";
+					// for (const auto& token : vecStateConfig) {
+					// 	std::cout << token << " ";
+					// }
+					// std::cout << std::endl;
+					// From the current group extract the FSM 
+					for (UInt32 i = 0; i < m_unNumberStates; i++) {
+						std::ostringstream oss;
+						oss << "--s" << i;
+						first_state = std::find(vecStateConfig.begin(), vecStateConfig.end(), oss.str());
+						if (i+1 < m_unNumberStates) {
+							std::ostringstream oss;
+							oss << "--s" << i+1;
+							second_state = std::find(vecStateConfig.begin(), vecStateConfig.end(), oss.str());
+						} else {
+							second_state = vecStateConfig.end();
+						}
+						std::vector<std::string> vecStateConfig(first_state, second_state);
+						HandleState(cFiniteStateMachine, vecStateConfig);
+						// for (const auto& token : vecStateConfig) {
+						// 	std::cout << token << " ";
+						// }
+						// std::cout << std::endl;
+					}
+				}
+
+				unRobotStartId += unGroupRobots;
 			}
 		}
 		catch (std::exception e) {
@@ -69,6 +114,16 @@ namespace argos {
 
 		return cFiniteStateMachine;
 
+	}
+
+	/****************************************/
+	/****************************************/
+
+	void AutoMoDeFsmBuilder::HandleGroup(AutoMoDeFiniteStateMachine* c_fsm, std::vector<std::string>& vec_fsm_state_config) {
+		// Extraction of the id of group
+		unGroupId =  atoi((*vec_fsm_state_config.begin()).substr(3,4).c_str());
+		// Extraction of the number of robots
+		unGroupRobots  =  atoi((*(vec_fsm_state_config.begin()+1)).c_str());
 	}
 
 	/****************************************/
@@ -241,4 +296,7 @@ namespace argos {
 		return vecPossibleDestinationIndex;
 	}
 
+	void AutoMoDeFsmBuilder::SetRobotId(unsigned int un_robot_id) {
+		m_unRobotId = un_robot_id;
+	}
 }

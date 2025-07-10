@@ -51,6 +51,8 @@ namespace argos {
 			 */
 			virtual ~AutoMoDeFsmBuilder();
 
+			void SetRobotId(unsigned int un_robot_id);
+
 		private:
 			/**
 			 * Creates a AutoMoDeBehaviour from a state configuration and add it to the
@@ -58,6 +60,7 @@ namespace argos {
 			 * Strips the different transitions and calls HandleTransition for their creation.
 			 */
 			void HandleState(AutoMoDeFiniteStateMachine* c_fsm, std::vector<std::string>& vec_fsm_state_config);
+			void HandleGroup(AutoMoDeFiniteStateMachine* c_fsm, std::vector<std::string>& vec_fsm_state_config);
 
 			/**
 			 * Creates a AutoMoDeCondition from a transition configuration and add it to the
@@ -73,6 +76,13 @@ namespace argos {
 			const std::vector<UInt32> GetPossibleDestinationBehaviour(const UInt32& un_initial_state_index);
 
 			UInt32 m_unNumberStates;
+			UInt32 m_unNumberGroups;
+			UInt32 m_unRobotId;
+			UInt32 unRobotStartId;
+
+			UInt8 unGroupId;
+			UInt8 unGroupRobots; 
+
 
 			AutoMoDeFiniteStateMachine* cFiniteStateMachine;
 
