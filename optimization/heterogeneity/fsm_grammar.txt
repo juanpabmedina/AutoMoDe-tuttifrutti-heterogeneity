@@ -1,0 +1,76 @@
+NumStates_0   "--nstates_0 "   i (1,2)
+S0_0     "--s0_0 "  c   (0,1,2,3,4,5) | as.numeric(NumStates_0)>0 
+VEL0_0   "--vel0_0 "  r (0.1,1.5) | as.numeric(S0_0)==8 
+CLE0_0   "--cle0_0 "  i (0,10)
+CLR0_0   "--clr0_0 "  i (0,10)
+NumConnections0_0 "--n0_0 " i (1,1) | as.numeric(NumStates_0)>0
+N0x0_0  "--n0x0_0 " i   (0,3) | as.numeric(NumConnections0_0)>0 
+C0x0_0  "--c0x0_0 " c   (0,1,2,3,4,5) | as.numeric(NumConnections0_0)>0 
+P0x0_0  "--p0x0_0 " r   (0,1) | as.numeric(C0x0_0) %in% c(0,1,2,5) 
+L0x0_0  "--l0x0_0 " i   (0,10) | as.numeric(C0x0_0)==5 
+S1_0     "--s1_0 "  c   (0,1,2,3,4,5) | as.numeric(NumStates_0)>1 
+VEL1_0   "--vel1_0 "  r (0.1,1.5) | as.numeric(S1_0)==8 
+CLE1_0   "--cle1_0 "  i (0,10)
+CLR1_0   "--clr1_0 "  i (0,10)
+NumConnections1_0 "--n1_0 " i (1,1) | as.numeric(NumStates_0)>1
+N1x0_0  "--n1x0_0 " i   (0,3) | as.numeric(NumConnections1_0)>0 
+C1x0_0  "--c1x0_0 " c   (0,1,2,3,4,5) | as.numeric(NumConnections1_0)>0 
+P1x0_0  "--p1x0_0 " r   (0,1) | as.numeric(C1x0_0) %in% c(0,1,2,5) 
+L1x0_0  "--l1x0_0 " i   (0,10) | as.numeric(C1x0_0)==5 
+NumStates_1   "--nstates_1 "   i (1,2)
+S0_1     "--s0_1 "  c   (0,1,2,3,4,5) | as.numeric(NumStates_1)>0 
+VEL0_1   "--vel0_1 "  r (0.1,1.5) | as.numeric(S0_1)==8 
+CLE0_1   "--cle0_1 "  i (0,10)
+CLR0_1   "--clr0_1 "  i (0,10)
+NumConnections0_1 "--n0_1 " i (1,1) | as.numeric(NumStates_1)>0
+N0x0_1  "--n0x0_1 " i   (0,3) | as.numeric(NumConnections0_1)>0 
+C0x0_1  "--c0x0_1 " c   (0,1,2,3,4,5) | as.numeric(NumConnections0_1)>0 
+P0x0_1  "--p0x0_1 " r   (0,1) | as.numeric(C0x0_1) %in% c(0,1,2,5) 
+L0x0_1  "--l0x0_1 " i   (0,10) | as.numeric(C0x0_1)==5 
+S1_1     "--s1_1 "  c   (0,1,2,3,4,5) | as.numeric(NumStates_1)>1 
+VEL1_1   "--vel1_1 "  r (0.1,1.5) | as.numeric(S1_1)==8 
+CLE1_1   "--cle1_1 "  i (0,10)
+CLR1_1   "--clr1_1 "  i (0,10)
+NumConnections1_1 "--n1_1 " i (1,1) | as.numeric(NumStates_1)>1
+N1x0_1  "--n1x0_1 " i   (0,3) | as.numeric(NumConnections1_1)>0 
+C1x0_1  "--c1x0_1 " c   (0,1,2,3,4,5) | as.numeric(NumConnections1_1)>0 
+P1x0_1  "--p1x0_1 " r   (0,1) | as.numeric(C1x0_1) %in% c(0,1,2,5) 
+L1x0_1  "--l1x0_1 " i   (0,10) | as.numeric(C1x0_1)==5 
+NumStates_2   "--nstates_2 "   i (1,2)
+S0_2     "--s0_2 "  c   (0,1,2,3,4,5) | as.numeric(NumStates_2)>0 
+VEL0_2   "--vel0_2 "  r (0.1,1.5) | as.numeric(S0_2)==8 
+CLE0_2   "--cle0_2 "  i (0,10)
+CLR0_2   "--clr0_2 "  i (0,10)
+NumConnections0_2 "--n0_2 " i (1,1) | as.numeric(NumStates_2)>0
+N0x0_2  "--n0x0_2 " i   (0,3) | as.numeric(NumConnections0_2)>0 
+C0x0_2  "--c0x0_2 " c   (0,1,2,3,4,5) | as.numeric(NumConnections0_2)>0 
+P0x0_2  "--p0x0_2 " r   (0,1) | as.numeric(C0x0_2) %in% c(0,1,2,5) 
+L0x0_2  "--l0x0_2 " i   (0,10) | as.numeric(C0x0_2)==5 
+S1_2     "--s1_2 "  c   (0,1,2,3,4,5) | as.numeric(NumStates_2)>1 
+VEL1_2   "--vel1_2 "  r (0.1,1.5) | as.numeric(S1_2)==8 
+CLE1_2   "--cle1_2 "  i (0,10)
+CLR1_2   "--clr1_2 "  i (0,10)
+NumConnections1_2 "--n1_2 " i (1,1) | as.numeric(NumStates_2)>1
+N1x0_2  "--n1x0_2 " i   (0,3) | as.numeric(NumConnections1_2)>0 
+C1x0_2  "--c1x0_2 " c   (0,1,2,3,4,5) | as.numeric(NumConnections1_2)>0 
+P1x0_2  "--p1x0_2 " r   (0,1) | as.numeric(C1x0_2) %in% c(0,1,2,5) 
+L1x0_2  "--l1x0_2 " i   (0,10) | as.numeric(C1x0_2)==5 
+NumStates_3   "--nstates_3 "   i (1,2)
+S0_3     "--s0_3 "  c   (0,1,2,3,4,5) | as.numeric(NumStates_3)>0 
+VEL0_3   "--vel0_3 "  r (0.1,1.5) | as.numeric(S0_3)==8 
+CLE0_3   "--cle0_3 "  i (0,10)
+CLR0_3   "--clr0_3 "  i (0,10)
+NumConnections0_3 "--n0_3 " i (1,1) | as.numeric(NumStates_3)>0
+N0x0_3  "--n0x0_3 " i   (0,3) | as.numeric(NumConnections0_3)>0 
+C0x0_3  "--c0x0_3 " c   (0,1,2,3,4,5) | as.numeric(NumConnections0_3)>0 
+P0x0_3  "--p0x0_3 " r   (0,1) | as.numeric(C0x0_3) %in% c(0,1,2,5) 
+L0x0_3  "--l0x0_3 " i   (0,10) | as.numeric(C0x0_3)==5 
+S1_3     "--s1_3 "  c   (0,1,2,3,4,5) | as.numeric(NumStates_3)>1 
+VEL1_3   "--vel1_3 "  r (0.1,1.5) | as.numeric(S1_3)==8 
+CLE1_3   "--cle1_3 "  i (0,10)
+CLR1_3   "--clr1_3 "  i (0,10)
+NumConnections1_3 "--n1_3 " i (1,1) | as.numeric(NumStates_3)>1
+N1x0_3  "--n1x0_3 " i   (0,3) | as.numeric(NumConnections1_3)>0 
+C1x0_3  "--c1x0_3 " c   (0,1,2,3,4,5) | as.numeric(NumConnections1_3)>0 
+P1x0_3  "--p1x0_3 " r   (0,1) | as.numeric(C1x0_3) %in% c(0,1,2,5) 
+L1x0_3  "--l1x0_3 " i   (0,10) | as.numeric(C1x0_3)==5 

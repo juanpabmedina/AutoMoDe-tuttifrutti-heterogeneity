@@ -48,10 +48,9 @@ namespace argos {
 		std::vector<std::string>::iterator gropus_it;
 
 		try {
-			states_it = std::find(vec_fsm_config.begin(), vec_fsm_config.end(), "--nstates");
+			// states_it = std::find(vec_fsm_config.begin(), vec_fsm_config.end(), "--nstates");
 			gropus_it = std::find(vec_fsm_config.begin(), vec_fsm_config.end(), "--ngroups");
 
-			m_unNumberStates = atoi((*(states_it+1)).c_str());
 			m_unNumberGroups = atoi((*(gropus_it+1)).c_str());
 
 			std::vector<std::string>::iterator first_state;
@@ -61,6 +60,15 @@ namespace argos {
 			std::vector<std::string>::iterator second_group;
 
 			for (UInt32 i = 0; i < m_unNumberGroups; ++i) {
+				std::ostringstream oss;
+				oss << "--nstates_" << i;  // i es el entero dinámico que cambia
+
+				states_it = std::find_if(vec_fsm_config.begin(), vec_fsm_config.end(),
+					[&oss](const std::string& s) {
+						return s.rfind(oss.str(), 0) == 0;  // comienza con "--nstates_i"
+					});
+				m_unNumberStates = atoi((*(states_it+1)).c_str());
+
 				// Looking for where group start
 				std::ostringstream oss_groups;
 				oss_groups << "--g" << i;
@@ -85,13 +93,14 @@ namespace argos {
 					// }
 					// std::cout << std::endl;
 					// From the current group extract the FSM 
-					for (UInt32 i = 0; i < m_unNumberStates; i++) {
+					for (UInt32 j = 0; j < m_unNumberStates; j++) {
 						std::ostringstream oss;
-						oss << "--s" << i;
+						std::cout<< "j: "<<j <<" i: "<< i<< std::endl;
+						oss << "--s" << j << "_" << i;
 						first_state = std::find(vecStateConfig.begin(), vecStateConfig.end(), oss.str());
-						if (i+1 < m_unNumberStates) {
+						if (j+1 < m_unNumberStates) {
 							std::ostringstream oss;
-							oss << "--s" << i+1;
+							oss << "--s" << (j+1) << "_" << i;
 							second_state = std::find(vecStateConfig.begin(), vecStateConfig.end(), oss.str());
 						} else {
 							second_state = vecStateConfig.end();
@@ -173,7 +182,7 @@ namespace argos {
 		for (UInt8 i = 0; i < unNumberPossibleParameters; i++) {
 			std::string strCurrentParameter = vecPossibleParameters[i];
 			std::ostringstream oss;
-			oss << "--" <<strCurrentParameter << unBehaviourIndex;
+			oss << "--" <<strCurrentParameter << unBehaviourIndex << "_" << unGroupId;
 			it = std::find(vec_fsm_state_config.begin(), vec_fsm_state_config.end(), oss.str());
 			if (it != vec_fsm_state_config.end()) {
 				Real fCurrentParameterValue = strtod((*(it+1)).c_str(), NULL);
@@ -189,7 +198,7 @@ namespace argos {
 		 * pass them to the transition handler, if they exist.
 		 */
 		std::ostringstream oss;
-		oss << "--n" << unBehaviourIndex;
+		oss << "--n" << unBehaviourIndex << "_" <<unGroupId;
 		it = std::find(vec_fsm_state_config.begin(), vec_fsm_state_config.end(), oss.str());
 		if (it != vec_fsm_state_config.end()) {
 			UInt8 unNumberTransitions = atoi((*(it+1)).c_str());
@@ -199,11 +208,11 @@ namespace argos {
 
 			for (UInt8 i = 0; i < unNumberTransitions; i++) {
 				std::ostringstream oss;
-				oss << "--n" << unBehaviourIndex << "x" << i;
+				oss << "--n" << unBehaviourIndex << "x" << i << "_" <<unGroupId;
 				first_transition = std::find(vec_fsm_state_config.begin(), vec_fsm_state_config.end(), oss.str());
 				if (i+1 < unNumberTransitions) {
 					std::ostringstream oss;
-					oss << "--n" << unBehaviourIndex << "x" << i+1;
+					oss << "--n" << unBehaviourIndex << "x" << i+1 << "_" <<unGroupId;
 					second_transition = std::find(vec_fsm_state_config.begin(), vec_fsm_state_config.end(), oss.str());
 				} else {
 					second_transition = vec_fsm_state_config.end();
@@ -221,7 +230,7 @@ namespace argos {
 		AutoMoDeCondition* cNewCondition;
 
 		std::stringstream ss;
-		ss << "--n" << un_initial_state_index << "x" << un_condition_index;
+		ss << "--n" << un_initial_state_index << "x" << un_condition_index << "_" <<unGroupId;
 		std::vector<UInt32> vecPossibleDestinationIndex = GetPossibleDestinationBehaviour(un_initial_state_index);
 		std::vector<std::string>::iterator it;
 		it = std::find(vec_fsm_transition_config.begin(), vec_fsm_transition_config.end(), ss.str());
@@ -231,7 +240,7 @@ namespace argos {
 		UInt32 unToBehaviour = vecPossibleDestinationIndex.at(unIndexBehaviour);
 		if (unToBehaviour < m_unNumberStates) {
 			ss.str(std::string());
-			ss << "--c" << un_initial_state_index << "x" << un_condition_index;
+			ss << "--c" << un_initial_state_index << "x" << un_condition_index << "_" <<unGroupId;
 			it = std::find(vec_fsm_transition_config.begin(), vec_fsm_transition_config.end(), ss.str());
 
 			UInt8 unConditionIdentifier = atoi((*(it+1)).c_str());
@@ -271,7 +280,7 @@ namespace argos {
 			for (UInt8 i = 0; i < unNumberPossibleParameters; i++) {
 				std::string strCurrentParameter = vecPossibleParameters[i];
 				ss.str(std::string());
-				ss << "--" << strCurrentParameter << un_initial_state_index << "x" << un_condition_index;
+				ss << "--" << strCurrentParameter << un_initial_state_index << "x" << un_condition_index << "_" <<unGroupId;
 				it = std::find(vec_fsm_transition_config.begin(), vec_fsm_transition_config.end(), ss.str());
 				if (it != vec_fsm_transition_config.end()) {
 					Real fCurrentParameterValue = strtod((*(it+1)).c_str(), NULL);
