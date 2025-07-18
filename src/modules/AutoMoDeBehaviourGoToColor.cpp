@@ -57,7 +57,7 @@ namespace argos {
 
         for (it = sReadings.BlobList.begin(); it != sReadings.BlobList.end(); it++) {
             if ((*it)->Color == m_cColorReceiverParameter && (*it)->Distance >= 6.0) {
-                sColVectorSum += CVector2(1 / (((*it)->Distance)+1), (*it)->Angle);
+                sColVectorSum += CVector2((((*it)->Distance)), (*it)->Angle); // Change here 
             }
             // TODO Check sColVectorSum function
         }

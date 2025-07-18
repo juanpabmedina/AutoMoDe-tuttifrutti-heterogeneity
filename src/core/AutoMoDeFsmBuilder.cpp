@@ -95,7 +95,6 @@ namespace argos {
 					// From the current group extract the FSM 
 					for (UInt32 j = 0; j < m_unNumberStates; j++) {
 						std::ostringstream oss;
-						std::cout<< "j: "<<j <<" i: "<< i<< std::endl;
 						oss << "--s" << j << "_" << i;
 						first_state = std::find(vecStateConfig.begin(), vecStateConfig.end(), oss.str());
 						if (j+1 < m_unNumberStates) {
