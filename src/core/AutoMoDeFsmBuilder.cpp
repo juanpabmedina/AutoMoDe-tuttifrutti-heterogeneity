@@ -48,72 +48,50 @@ namespace argos {
 		std::vector<std::string>::iterator gropus_it;
 
 		try {
-			// states_it = std::find(vec_fsm_config.begin(), vec_fsm_config.end(), "--nstates");
-			gropus_it = std::find(vec_fsm_config.begin(), vec_fsm_config.end(), "--ngroups");
 
-			m_unNumberGroups = atoi((*(gropus_it+1)).c_str());
+			// Extract group index from --nstates_<group_id>
+			for (auto it = vec_fsm_config.begin(); it != vec_fsm_config.end(); ++it) {
+				if (it->rfind("--nstates_", 0) == 0) {
+					std::string group_suffix = it->substr(10); // after "--nstates_"
+					unGroupId = std::stoi(group_suffix);
+					m_unNumberStates = std::stoi(*(it + 1));
+					break;
+				}
+			}
 
-			std::vector<std::string>::iterator first_state;
-			std::vector<std::string>::iterator second_state;
+			// std::cout << "FSM Configuration:" << std::endl;
+			// for (size_t i = 0; i < vec_fsm_config.size(); ++i) {
+			// 	std::cout << " " << vec_fsm_config[i];
+			// }
+			// std::cout << std::endl;
 
-			std::vector<std::string>::iterator first_group;
-			std::vector<std::string>::iterator second_group;
 
-			for (UInt32 i = 0; i < m_unNumberGroups; ++i) {
-				std::ostringstream oss;
-				oss << "--nstates_" << i;  // i es el entero dinámico que cambia
 
-				states_it = std::find_if(vec_fsm_config.begin(), vec_fsm_config.end(),
-					[&oss](const std::string& s) {
-						return s.rfind(oss.str(), 0) == 0;  // comienza con "--nstates_i"
-					});
-				m_unNumberStates = atoi((*(states_it+1)).c_str());
+			if (unGroupId == (UInt32)-1) {
+				THROW_ARGOSEXCEPTION("Could not find --nstates_<group_id> in FSM configuration.");
+			}
 
-				// Looking for where group start
-				std::ostringstream oss_groups;
-				oss_groups << "--g" << i;
-				first_group = std::find(vec_fsm_config.begin(), vec_fsm_config.end(), oss_groups.str());
-				if (i+1 < m_unNumberGroups) {
-					std::ostringstream oss_groups;
-					oss_groups << "--g" << i+1;
-					second_group = std::find(vec_fsm_config.begin(), vec_fsm_config.end(), oss_groups.str());
+			// Create and fill FSM
+			// HandleGroup(cFiniteStateMachine, vec_fsm_config);
+
+			for (UInt32 j = 0; j < m_unNumberStates; ++j) {
+				std::ostringstream ossStart;
+				ossStart << "--s" << j << "_" << unGroupId;
+				auto itStart = std::find(vec_fsm_config.begin(), vec_fsm_config.end(), ossStart.str());
+
+				std::vector<std::string>::iterator itEnd;
+				if (j + 1 < m_unNumberStates) {
+					std::ostringstream ossEnd;
+					ossEnd << "--s" << (j + 1) << "_" << unGroupId;
+					itEnd = std::find(vec_fsm_config.begin(), vec_fsm_config.end(), ossEnd.str());
 				} else {
-					second_group = vec_fsm_config.end();
-				}
-				std::vector<std::string> vecStateConfig(first_group, second_group);
-				HandleGroup(cFiniteStateMachine, vecStateConfig);
-
-				UInt32 unRobotEndId = unRobotStartId + unGroupRobots - 1;
-				// Assign the robots to the groups based on the RobotID
-				if (m_unRobotId >= unRobotStartId && m_unRobotId <= unRobotEndId) {
-					// std::cout << "Robot: " << m_unRobotId << " assigned to group: " << unGroupId;
-					// std::cout << " With FSM: ";
-					// for (const auto& token : vecStateConfig) {
-					// 	std::cout << token << " ";
-					// }
-					// std::cout << std::endl;
-					// From the current group extract the FSM 
-					for (UInt32 j = 0; j < m_unNumberStates; j++) {
-						std::ostringstream oss;
-						oss << "--s" << j << "_" << i;
-						first_state = std::find(vecStateConfig.begin(), vecStateConfig.end(), oss.str());
-						if (j+1 < m_unNumberStates) {
-							std::ostringstream oss;
-							oss << "--s" << (j+1) << "_" << i;
-							second_state = std::find(vecStateConfig.begin(), vecStateConfig.end(), oss.str());
-						} else {
-							second_state = vecStateConfig.end();
-						}
-						std::vector<std::string> vecStateConfig(first_state, second_state);
-						HandleState(cFiniteStateMachine, vecStateConfig);
-						// for (const auto& token : vecStateConfig) {
-						// 	std::cout << token << " ";
-						// }
-						// std::cout << std::endl;
-					}
+					itEnd = vec_fsm_config.end();
 				}
 
-				unRobotStartId += unGroupRobots;
+				if (itStart != vec_fsm_config.end()) {
+					std::vector<std::string> vecStateConfig(itStart, itEnd);
+					HandleState(cFiniteStateMachine, vecStateConfig);
+				}
 			}
 		}
 		catch (std::exception e) {
@@ -302,9 +280,5 @@ namespace argos {
 			}
 		}
 		return vecPossibleDestinationIndex;
-	}
-
-	void AutoMoDeFsmBuilder::SetRobotId(unsigned int un_robot_id) {
-		m_unRobotId = un_robot_id;
 	}
 }

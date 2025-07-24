@@ -49,16 +49,16 @@ namespace argos {
 			THROW_ARGOSEXCEPTION_NESTED("Error parsing <params>", ex);
 		}
 
-		m_unRobotID = atoi(GetId().substr(5, 6).c_str());
-		m_pcRobotState->SetRobotIdentifier(m_unRobotID);
+		m_unRobotID = GetRobotNumericId();
 
 		/*
 		 * If a FSM configuration is given as parameter of the experiment file, create a FSM from it
 		 */
 		if (m_strFsmConfiguration.compare("") != 0 && !m_bFiniteStateMachineGiven) {
 			m_pcFsmBuilder = new AutoMoDeFsmBuilder();
-			m_pcFsmBuilder->SetRobotId(m_unRobotID);
-			SetFiniteStateMachine(m_pcFsmBuilder->BuildFiniteStateMachine(m_strFsmConfiguration));
+			std::string strGroupFsm = ExtractGroupFsmConfig(m_strFsmConfiguration, m_unRobotID);
+			// std::cout << "Robot id: "<< m_unRobotID << " FSM: " << strGroupFsm << std::endl;
+			SetFiniteStateMachine(m_pcFsmBuilder->BuildFiniteStateMachine(strGroupFsm));
 			if (m_bMaintainHistory) {
 				m_pcFiniteStateMachine->SetHistoryFolder(m_strHistoryFolder);
 				m_pcFiniteStateMachine->MaintainHistory();
@@ -102,6 +102,66 @@ namespace argos {
 		 * Starts actuation.
 		 */
 		 InitializeActuation();
+	}
+	/****************************************/
+	/****************************************/
+
+	std::string AutoMoDeController::ExtractGroupFsmConfig(const std::string& strFullConfig, UInt32 unRobotId) {
+		std::istringstream iss(strFullConfig);
+		std::vector<std::string> tokens;
+		std::string token;
+
+		// Tokenize input
+		while (iss >> token) {
+			tokens.push_back(token);
+		}
+
+		UInt32 unNumGroups = 0;
+		std::vector<UInt32> vecGroupSizes;
+
+		// First pass: extract group sizes
+		for (size_t i = 0; i < tokens.size(); ++i) {
+			if (tokens[i] == "--ngroups" && i + 1 < tokens.size()) {
+				unNumGroups = std::stoi(tokens[i + 1]);
+			} else if (tokens[i].substr(0, 3) == "--g") {
+				vecGroupSizes.push_back(std::stoi(tokens[i + 1]));
+			}
+		}
+
+		if (unNumGroups != vecGroupSizes.size()) {
+			throw std::runtime_error("Mismatch between --ngroups and number of --g<i> entries");
+		}
+
+		// Determine group index of the robot
+		UInt32 unGroupIndex = 0;
+		UInt32 unAccumulatedRobots = 0;
+		for (UInt32 i = 0; i < vecGroupSizes.size(); ++i) {
+			unAccumulatedRobots += vecGroupSizes[i];
+			if (unRobotId < unAccumulatedRobots) {
+				unGroupIndex = i;
+				break;
+			}
+		}
+
+		// Second pass: extract only group-specific parameters (ending in _<groupIndex>)
+		std::ostringstream oss;
+		std::string groupSuffix = "_" + std::to_string(unGroupIndex);
+		for (size_t i = 0; i + 1 < tokens.size(); ++i) {
+			const std::string& key = tokens[i];
+			const std::string& value = tokens[i + 1];
+
+			// Skip general flags like --ngroups, --g0, etc.
+			if (key.find("--g") == 0 || key == "--ngroups") continue;
+
+			// Include if it ends with _<groupIndex>
+			if (key.size() > groupSuffix.size() &&
+				key.compare(key.size() - groupSuffix.size(), groupSuffix.size(), groupSuffix) == 0) {
+				oss << key << " " << value << " ";
+				++i; // Skip value
+			}
+		}
+
+		return oss.str();
 	}
 
 	/****************************************/
@@ -157,6 +217,9 @@ namespace argos {
 		}
 		m_unTimeStep++;
 
+	}
+	UInt32 AutoMoDeController::GetRobotNumericId() {
+		return atoi(GetId().substr(5, 6).c_str());
 	}
 
 	/****************************************/

@@ -70,6 +70,11 @@ namespace argos{
 
 			void SetHistoryFlag(bool b_history_flag);
 
+			UInt32 GetRobotNumericId();
+			
+			std::string ExtractGroupFsmConfig(const std::string& strFullConfig, UInt32 unRobotId);
+
+
 		private:
 			/*
 			 * Function that contains all actuations required at the start of an experiment or during the entire experiment.

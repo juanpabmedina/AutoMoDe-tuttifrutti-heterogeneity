@@ -51,7 +51,6 @@ namespace argos {
 			 */
 			virtual ~AutoMoDeFsmBuilder();
 
-			void SetRobotId(unsigned int un_robot_id);
 
 		private:
 			/**
@@ -77,7 +76,7 @@ namespace argos {
 
 			UInt32 m_unNumberStates;
 			UInt32 m_unNumberGroups;
-			UInt32 m_unRobotId;
+			
 			UInt32 unRobotStartId;
 
 			UInt8 unGroupId;

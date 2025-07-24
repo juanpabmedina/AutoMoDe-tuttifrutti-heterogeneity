@@ -67,7 +67,12 @@ int main(int n_argc, char** ppch_argv) {
 		if (!bFsmControllerFound) {
 			THROW_ARGOSEXCEPTION(ExplainParameters());
 		}
-
+		
+		std::ostringstream oss;
+		for (const auto& s : vecConfigFsm) {
+			oss << s << " ";
+		}
+		std::string strFullFsmConfig = oss.str();
 		// Configure the command line options
 		CARGoSCommandLineArgParser cACLAP;
 		cACLAP.AddFlag('r', "readable-fsm", "", bReadableFSM);
@@ -89,12 +94,12 @@ int main(int n_argc, char** ppch_argv) {
 				// Creation of the finite state machine.
 
 				AutoMoDeFsmBuilder cBuilder = AutoMoDeFsmBuilder();
-				AutoMoDeFiniteStateMachine* pcFiniteStateMachine = cBuilder.BuildFiniteStateMachine(vecConfigFsm);
+				// AutoMoDeFiniteStateMachine* pcFiniteStateMachine = cBuilder.BuildFiniteStateMachine(vecConfigFsm);
 
 				// If the URL of the finite state machine is requested, display it.
 				if (bReadableFSM) {
-					std::cout << "Finite State Machine description: " << std::endl;
-					std::cout << pcFiniteStateMachine->GetReadableFormat() << std::endl;
+					std::cout << "Finite State Machine description: sorry, not working :( )" << std::endl;
+					// std::cout << pcFiniteStateMachine->GetReadableFormat() << std::endl;
 				}
 
 				// Setting random seed. Only works with modified version of ARGoS3.
@@ -106,6 +111,10 @@ int main(int n_argc, char** ppch_argv) {
 				CSpace::TMapPerType cEntities = cSimulator.GetSpace().GetEntitiesByType("controller");
 				for (CSpace::TMapPerType::iterator it = cEntities.begin(); it != cEntities.end(); ++it) {
 					CControllableEntity* pcEntity = any_cast<CControllableEntity*>(it->second);
+					AutoMoDeController& cController0 = dynamic_cast<AutoMoDeController&> (pcEntity->GetController());
+					UInt8 unRobotId = cController0.GetRobotNumericId();
+					std::string strGroupFsmConfig = cController0.ExtractGroupFsmConfig(strFullFsmConfig, unRobotId);
+					AutoMoDeFiniteStateMachine* pcFiniteStateMachine = cBuilder.BuildFiniteStateMachine(strGroupFsmConfig);
 					AutoMoDeFiniteStateMachine* pcPersonalFsm = new AutoMoDeFiniteStateMachine(pcFiniteStateMachine);
 					vecFsm.push_back(pcPersonalFsm);
 					try {
@@ -162,3 +171,9 @@ int main(int n_argc, char** ppch_argv) {
 	/* Everything's ok, exit */
   return 0;
 }
+
+
+void SetRobotId(unsigned int un_robot_id) {
+		UInt8 m_unRobotId = un_robot_id;
+	}
+
